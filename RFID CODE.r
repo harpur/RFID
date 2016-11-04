@@ -1,4 +1,3 @@
-#!/usr/bin/env Rscript
 ###
 # MajaIV RFID Data Cleaner
 ###
@@ -21,16 +20,17 @@
 #so an exiting flight would be 4-6, 7-2, 8-5, or 1-3
 #return flights would be 6-4, 2-7, 5-8, and 3-1.
 
-
+#!/usr/bin/env Rscript
 #Load Dependancies--------------
-	#Note, you must isntall these locally (e.g. install.packages(c(gdata,dataframes2xls )))
+	#Note, you must install these locally (e.g. install.packages(c(gdata,dataframes2xls )))
 require("gdata")
 require("dataframes2xls")
 
+#Arguments------------------------------
 
 #Read in Dataframe --------------------------
 #args = commandArgs(trailingOnly=TRUE)
-raw.data = read.xls("Sample RFID Data Set (1).xlsx") #args[1]
+raw.data = read.xls(args[1]) #"Sample RFID Data Set (1).xlsx"
 
 #convert columns to time, date, etc ---------------
 raw.data[ ,1] = as.POSIXct(raw.data[ ,1], format="%m/%d/%Y %I:%M:%S %p")  ## Convert to usable date and time of creation (in the PM format)
@@ -39,7 +39,7 @@ raw.data$UTCTime_Round = round(raw.data$UTCTime, units = "secs") ## round the mi
 raw.data = raw.data[order(raw.data[,4 ]),] ## order by date and time
 raw.data = raw.data[order(raw.data$UID),] ## oreder by ID
 raw.data$Date = lapply(strsplit(as.character(raw.data$UTCTime), " "), "[", 1) ## Get a column with just dates
-bees = as.character(unique(RF$UID))
+bees = as.character(unique(raw.data$UID))
 
 
 #Output some data checks --------------------------------
@@ -60,7 +60,7 @@ for(bee in bees){ ##Creating a loop for each variable in dataframe "bees"
 		date.df=test[which(test$Date==Date), ]
 		ad=date.df$Address;ad=c(ad, 0) ##creating directionality -- new list of all the column Address plus a zero at the end
 		ad1=date.df$Address; ad1=c(0, ad1) ##creating directionality -- new list of all the column Address plus a zero at the beginning
-		ad=paste(ad1, ad, sep="") ##pasting the two lists together
+		ad=paste(ad1, ad, sep="-") ##pasting the two lists together
 		
 		ax=date.df$UTCTime; ax=c(ax,ax[length(ax)]) ##listing all the times plus an entery that equals the last time
 		ax1=date.df$UTCTime; ax1=c(ax1[1], ax1) ##listing all the times plus an entery that equals the fist time
@@ -76,6 +76,20 @@ for(bee in bees){ ##Creating a loop for each variable in dataframe "bees"
 	}
 	print(bee)
 }
+
+mung.df = mung.df[c("UTCTime_Round", "UID", "timediff", "dir")]
+
+
+write.xls(mung.df, file = paste(arg[2], ".xlsx",sep=""))
+
+
+
+
+
+
+
+
+
 
 ##FInal output file = mung.df
 
