@@ -26,10 +26,9 @@
 require("gdata")
 require("dataframes2xls")
 
-#Arguments------------------------------
 
 #Read in Dataframe --------------------------
-#args = commandArgs(trailingOnly=TRUE)
+args = commandArgs(trailingOnly=TRUE)
 raw.data = read.xls(args[1]) #"Sample RFID Data Set (1).xlsx"
 
 #convert columns to time, date, etc ---------------
@@ -80,7 +79,7 @@ for(bee in bees){ ##Creating a loop for each variable in dataframe "bees"
 mung.df = mung.df[c("UTCTime_Round", "UID", "timediff", "dir")]
 
 
-write.xls(mung.df, file = paste(arg[2], ".xlsx",sep=""))
+write.xls(mung.df, file = paste(args[2], ".xlsx",sep=""))
 
 
 
